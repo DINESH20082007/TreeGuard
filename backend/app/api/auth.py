@@ -53,25 +53,52 @@ async def login(
     """
     user = await auth_service.authenticate_user(db, data.email, data.password)
     access_token = auth_service.create_access_token(user, remember_me=data.remember_me)
+    is_client = bool(getattr(user, "is_client_presentation", False) or user.email == "client@treeguard.org")
+    user_resp = UserResponse(
+        id=user.id,
+        full_name=user.full_name,
+        email=user.email,
+        role=user.role,
+        phone_number=user.phone_number,
+        primary_district=user.primary_district or "RS Puram, Coimbatore",
+        avatar_url=user.avatar_url,
+        is_client_presentation=is_client,
+        can_access_all_dashboards=is_client,
+        is_active=user.is_active,
+        created_at=user.created_at,
+    )
     return TokenResponse(
         access_token=access_token,
         token_type="bearer",
-        user=UserResponse.model_validate(user)
+        user=user_resp
     )
 
 @router.get(
     "/me",
     response_model=UserResponse,
     status_code=status.HTTP_200_OK,
-    summary="Get currently authenticated user"
+    summary="Get current user summary"
 )
 async def get_me(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Returns the authenticated user extracted securely from the JWT token.
+    Returns basic user details for the authenticated session.
     """
-    return current_user
+    is_client = bool(getattr(current_user, "is_client_presentation", False) or current_user.email == "client@treeguard.org")
+    return UserResponse(
+        id=current_user.id,
+        full_name=current_user.full_name,
+        email=current_user.email,
+        role=current_user.role,
+        phone_number=current_user.phone_number,
+        primary_district=current_user.primary_district or "RS Puram, Coimbatore",
+        avatar_url=current_user.avatar_url,
+        is_client_presentation=is_client,
+        can_access_all_dashboards=is_client,
+        is_active=current_user.is_active,
+        created_at=current_user.created_at,
+    )
 
 @router.post(
     "/logout",

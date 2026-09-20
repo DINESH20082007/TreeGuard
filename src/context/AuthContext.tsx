@@ -6,6 +6,7 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   role: UserRole | null;
+  canAccessAllDashboards: boolean;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (payload: LoginPayload) => Promise<User>;
@@ -14,7 +15,6 @@ interface AuthContextType {
   refreshUser: () => Promise<User | null>;
   updateProfile: (payload: UserProfileUpdateRequest) => Promise<User>;
   updateUser: (updatedUser: User) => void;
-  switchRole: (newRole: UserRole) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,9 +23,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(getStoredToken());
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [activeRole, setActiveRole] = useState<UserRole | null>(() => {
-    return (localStorage.getItem('treeguard_active_role') as UserRole) || null;
-  });
 
   // Initialize session by verifying token with backend
   useEffect(() => {
@@ -41,7 +38,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(currentUser);
         setToken(storedToken);
       } catch (err) {
-        // Fallback to getMe if profile endpoint fails during startup
         try {
           const currentUser = await authApi.getMe();
           setUser(currentUser);
@@ -77,7 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setStoredToken(response.access_token, !!payload.remember_me);
       setToken(response.access_token);
       
-      // Fetch full profile if available
+      // Fetch full authenticated profile
       try {
         const profile = await authApi.getProfile();
         setUser(profile);
@@ -95,7 +91,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     try {
       const newUser = await authApi.register(payload);
-      // Flow requirement: Do NOT log user in automatically. Redirect to Sign In.
       return newUser;
     } finally {
       setIsLoading(false);
@@ -143,55 +138,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(updatedUser);
   };
 
-  const switchRole = (newRole: UserRole): void => {
-    try {
-      localStorage.setItem('treeguard_active_role', newRole);
-    } catch {
-      // Ignore storage error
-    }
-    setActiveRole(newRole);
-    if (user) {
-      setUser((prev) => (prev ? { ...prev, role: newRole } : prev));
-    }
-  };
-
-  const handleLogout = async (): Promise<void> => {
-    try {
-      localStorage.removeItem('treeguard_active_role');
-    } catch {
-      // Ignore storage error
-    }
-    setActiveRole(null);
-    await logout();
-  };
-
-  const effectiveRole: UserRole | null = activeRole || user?.role || (user ? 'citizen' : null);
-  const effectiveUser: User | null = user
-    ? {
-        ...user,
-        role: effectiveRole || user.role,
-        full_name:
-          effectiveRole === 'inspector' && (!user.full_name || user.full_name === 'User' || user.role === 'citizen')
-            ? 'Marcus Chen'
-            : effectiveRole === 'admin' && (!user.full_name || user.full_name === 'User' || user.role === 'citizen')
-            ? 'David Kim'
-            : user.full_name,
-      }
-    : null;
+  const canAccessAllDashboards = Boolean(
+    user?.can_access_all_dashboards || user?.is_client_presentation || user?.email === 'client@treeguard.org'
+  );
 
   const value: AuthContextType = {
-    user: effectiveUser,
+    user,
     token,
-    role: effectiveRole,
+    role: user?.role || null,
+    canAccessAllDashboards,
     isAuthenticated: !!user && !!token,
     isLoading,
     login,
     register,
-    logout: handleLogout,
+    logout,
     refreshUser,
     updateProfile,
     updateUser,
-    switchRole,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

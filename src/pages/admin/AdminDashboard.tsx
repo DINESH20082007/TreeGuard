@@ -22,78 +22,9 @@ function getGreeting(): string {
   return 'Good evening';
 }
 
-const DEMO_ADMIN_DASHBOARD: AdminDashboardResponse = {
-  organization_name: 'Coimbatore Urban Forestry Department',
-  current_date: new Date().toISOString(),
-  top_cards: [],
-  emergency_over_time: [],
-  health_trend: [],
-  response_time: [],
-  summary: {
-    total_trees: 19,
-    healthy_trees: 13,
-    at_risk_trees: 4,
-    emergency_trees: 2,
-    total_reports: 24,
-    pending_reports: 3,
-    active_emergencies: 2,
-    completed_inspections: 18,
-    total_observations: 33,
-    total_recovery_plans: 8,
-  },
-  trees_breakdown: {
-    total: 19,
-    healthy: 13,
-    monitoring: 4,
-    at_risk: 4,
-    emergency: 2,
-  },
-  reports_breakdown: {
-    total: 24,
-    pending: 3,
-    under_review: 2,
-    resolved: 19,
-  },
-  emergencies_breakdown: {
-    total: 2,
-    open: 2,
-    resolved: 7,
-  },
-  inspections_breakdown: {
-    total: 18,
-    completed: 18,
-    pending: 3,
-    follow_up_required: 1,
-  },
-  services_breakdown: {
-    required: 2,
-    in_progress: 1,
-    completed: 6,
-  },
-  health_distribution: [
-    { name: 'Healthy', value: 13, color: '#16a34a' },
-    { name: 'Monitoring', value: 4, color: '#0284c7' },
-    { name: 'At Risk', value: 4, color: '#f59e0b' },
-    { name: 'Critical', value: 2, color: '#dc2626' },
-  ],
-  recent_reports: [
-    { id: 'TRG-2026-1199', title: 'Severe branch split over main roadway', location_name: 'RS Puram West Zone', issue_type: 'branch', priority: 'Emergency', status: 'pending', created_at: new Date().toISOString() },
-    { id: 'TRG-2026-1082', title: 'Neem canopy dielectric dryout and dieback', location_name: 'Race Course Ward 14', issue_type: 'health', priority: 'High', status: 'under-review', created_at: new Date().toISOString() },
-    { id: 'TRG-2026-0955', title: 'Root heave damaging stormwater sidewalk', location_name: 'Saibaba Colony', issue_type: 'blocking', priority: 'Medium', status: 'assigned', created_at: new Date().toISOString() },
-  ],
-  active_emergencies: [
-    { id: 'EMG-2026-0112', issue: 'Imminent Tree Fall Over Active Powerline', location: 'DB Road & 4th Cross, RS Puram', severity: 'Critical', inspector: 'Marcus Chen', status: 'In Progress' },
-    { id: 'EMG-2026-0098', issue: 'Split Banyan Trunk After High Wind Gust', location: 'Avinashi Road Circle', severity: 'Emergency', inspector: 'Priya Natarajan', status: 'Assigned' },
-  ],
-  recent_inspections: [
-    { id: 'ASN-2026-0105', title: 'Gulmohar Branch Clearance & Cabling', tree_id: 'TRE-5511', location_name: 'Saibaba Colony', priority: 'Low', inspection_status: 'Inspection Completed', service_status: 'Service Completed', completed_at: new Date().toISOString() },
-    { id: 'ASN-2026-0092', title: 'Rain Tree Root Barrier Assessment', tree_id: 'TRE-6320', location_name: 'Peelamedu Park', priority: 'Medium', inspection_status: 'Inspection Completed', service_status: 'Not Required', completed_at: new Date().toISOString() },
-  ],
-};
-
 export default function AdminDashboard() {
   const { user } = useAuth();
-  const displayName = user?.full_name || 'David Kim';
+  const displayName = user?.full_name || 'Admin Officer';
   const greeting = getGreeting();
 
   const [data, setData] = useState<AdminDashboardResponse | null>(null);
@@ -106,9 +37,9 @@ export default function AdminDashboard() {
     try {
       const res = await adminApi.getDashboard();
       setData(res);
-    } catch {
-      // Presentation/Demo mode fallback: load full organization model
-      setData(DEMO_ADMIN_DASHBOARD);
+    } catch (err: any) {
+      setError(err?.message || 'Failed to load organization admin dashboard data.');
+      setData(null);
     } finally {
       setIsLoading(false);
     }
@@ -306,56 +237,6 @@ export default function AdminDashboard() {
           <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Completed Work</p>
           <p className="text-2xl font-bold text-teal-600">{servicesBreakdown.completed + inspectionsBreakdown.completed}</p>
           <p className="text-[11px] text-gray-400 mt-0.5">Verified completions</p>
-        </div>
-      </div>
-
-      {/* Admin Quick Actions Toolbar */}
-      <div className="bg-slate-900 rounded-2xl p-5 text-white shadow-lg space-y-3">
-        <div className="flex items-center justify-between flex-wrap gap-2 border-b border-slate-800 pb-3">
-          <h3 className="font-bold text-xs uppercase tracking-wider text-slate-300">
-            Administrative Quick Operations & Dispatch
-          </h3>
-          <span className="text-[11px] font-mono text-emerald-400 bg-slate-800 px-2.5 py-0.5 rounded">
-            Live Central Command
-          </span>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 text-xs">
-          <Link
-            to="/app/reports"
-            className="p-3 bg-slate-800 hover:bg-slate-700 rounded-xl font-bold transition flex items-center gap-2 border border-slate-700/60"
-          >
-            <span>📋</span>
-            <span>Manage Reports</span>
-          </Link>
-          <Link
-            to="/app/emergency"
-            className="p-3 bg-red-950/70 hover:bg-red-900 text-red-200 rounded-xl font-bold transition flex items-center gap-2 border border-red-800/40"
-          >
-            <span>🚨</span>
-            <span>Emergency Operations</span>
-          </Link>
-          <Link
-            to="/app/reports"
-            className="p-3 bg-slate-800 hover:bg-slate-700 rounded-xl font-bold transition flex items-center gap-2 border border-slate-700/60"
-          >
-            <span>👤</span>
-            <span>Assign Inspector</span>
-          </Link>
-          <Link
-            to="/app/admin/analytics"
-            className="p-3 bg-slate-800 hover:bg-slate-700 rounded-xl font-bold transition flex items-center gap-2 border border-slate-700/60"
-          >
-            <span>📊</span>
-            <span>View Analytics</span>
-          </Link>
-          <Link
-            to="/app/admin/monitoring"
-            className="p-3 bg-emerald-950/70 hover:bg-emerald-900 text-emerald-200 rounded-xl font-bold transition flex items-center gap-2 border border-emerald-800/40"
-          >
-            <span>👥</span>
-            <span>Manage Users & Team</span>
-          </Link>
         </div>
       </div>
 

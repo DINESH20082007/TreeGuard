@@ -12,6 +12,7 @@ class User(Base):
     password_hash = Column(String(255), nullable=False)
     role = Column(String(50), nullable=False, default="citizen")  # citizen, inspector, admin
     is_active = Column(Boolean, default=True, nullable=False)
+    is_client_presentation = Column(Boolean, default=False, nullable=False)
 
     # Extended Profile Fields
     phone_number = Column(String(50), nullable=True)

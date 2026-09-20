@@ -9,7 +9,7 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles, children }) => {
-  const { isAuthenticated, isLoading, role } = useAuth();
+  const { isAuthenticated, isLoading, role, canAccessAllDashboards } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -27,9 +27,10 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles, ch
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (allowedRoles && (!role || !allowedRoles.includes(role))) {
-    // Redirect to the appropriate home base for the user's role
-    const fallbackPath = role === 'admin' ? '/app/admin' : role === 'inspector' ? '/app/inspector' : '/app';
+  // If user has multi-dashboard client presentation access, allow all operational routes
+  // Otherwise strictly enforce assigned role permissions
+  if (allowedRoles && !canAccessAllDashboards && (!role || !allowedRoles.includes(role))) {
+    const fallbackPath = role === 'admin' ? '/app/admin' : role === 'inspector' ? '/app/inspector' : '/app/citizen';
     return <Navigate to={fallbackPath} replace />;
   }
 
@@ -55,7 +56,7 @@ export const PublicOnlyRoute: React.FC<PublicOnlyRouteProps> = ({ children }) =>
   }
 
   if (isAuthenticated) {
-    const homePath = role === 'admin' ? '/app/admin' : role === 'inspector' ? '/app/inspector' : '/app';
+    const homePath = role === 'admin' ? '/app/admin' : role === 'inspector' ? '/app/inspector' : '/app/citizen';
     return <Navigate to={homePath} replace />;
   }
 

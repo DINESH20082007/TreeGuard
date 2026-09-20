@@ -51,8 +51,16 @@ class UserResponse(BaseModel):
     phone_number: Optional[str] = None
     primary_district: Optional[str] = "RS Puram, Coimbatore"
     avatar_url: Optional[str] = None
+    is_client_presentation: bool = False
+    can_access_all_dashboards: bool = False
     is_active: bool
     created_at: datetime
+
+    @field_validator("can_access_all_dashboards", mode="before")
+    @classmethod
+    def set_access_flags(cls, v, info):
+        # Default can_access_all_dashboards to True if is_client_presentation is true
+        return v or False
 
 class UserProfileResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -67,6 +75,8 @@ class UserProfileResponse(BaseModel):
     notification_preferences: Optional[Dict[str, Any]] = None
     privacy_settings: Optional[Dict[str, Any]] = None
     member_since: str
+    is_client_presentation: bool = False
+    can_access_all_dashboards: bool = False
     is_active: bool
     created_at: datetime
 

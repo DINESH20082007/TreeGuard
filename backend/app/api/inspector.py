@@ -71,8 +71,9 @@ async def get_assignment_detail(
             detail=f"Assignment with ID '{assignment_id}' not found."
         )
 
-    # Permission check: must belong to the inspector or user must be admin
-    if assignment.inspector_id != current_user.id and current_user.role != "admin":
+    # Permission check: must belong to the inspector or user must be admin or client presentation account
+    is_client = bool(getattr(current_user, "is_client_presentation", False) or current_user.email == "client@treeguard.org")
+    if assignment.inspector_id != current_user.id and current_user.role != "admin" and not is_client:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You do not have permission to view this assignment."
@@ -102,7 +103,8 @@ async def update_assignment_workflow(
             detail=f"Assignment with ID '{assignment_id}' not found."
         )
 
-    if assignment.inspector_id != current_user.id and current_user.role != "admin":
+    is_client = bool(getattr(current_user, "is_client_presentation", False) or current_user.email == "client@treeguard.org")
+    if assignment.inspector_id != current_user.id and current_user.role != "admin" and not is_client:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You do not have permission to modify this assignment."
@@ -154,7 +156,8 @@ async def complete_assignment(
             detail=f"Assignment with ID '{assignment_id}' not found."
         )
 
-    if assignment.inspector_id != current_user.id and current_user.role != "admin":
+    is_client = bool(getattr(current_user, "is_client_presentation", False) or current_user.email == "client@treeguard.org")
+    if assignment.inspector_id != current_user.id and current_user.role != "admin" and not is_client:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You do not have permission to complete this assignment."

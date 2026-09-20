@@ -113,99 +113,6 @@ export default function InspectorDashboard() {
     year: 'numeric',
   });
 
-const DEMO_INSPECTOR_ASSIGNMENTS: InspectorAssignment[] = [
-  {
-    id: 'ASN-2026-0101',
-    inspector_id: 'usr-insp-001',
-    report_id: 'TRG-2026-0812',
-    tree_id: 'TRE-7417',
-    title: 'Emergency: Heavy Limb Hanging Over Pedestrian Walkway',
-    location_name: 'DB Road, RS Puram (Opp. City Bank)',
-    priority: 'Emergency',
-    status: 'emergency',
-    inspection_status: 'In Progress',
-    service_required: true,
-    service_status: 'Required',
-    ai_assessment: 'AI detected 88% probability of structural limb failure under high wind load.',
-    assigned_at: new Date(Date.now() - 3600000 * 4).toISOString(),
-    due_date: new Date(Date.now() + 3600000 * 8).toISOString(),
-    created_at: new Date(Date.now() - 3600000 * 4).toISOString(),
-    image_url: 'https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=300&fit=crop',
-  },
-  {
-    id: 'ASN-2026-0102',
-    inspector_id: 'usr-insp-001',
-    report_id: 'TRG-2026-0941',
-    tree_id: 'TRE-8832',
-    title: 'Root Decay and Significant Trunk Cavity in Mature Neem',
-    location_name: 'Avinashi Road, Race Course Ward 14',
-    priority: 'High',
-    status: 'in-progress',
-    inspection_status: 'Assigned',
-    service_required: true,
-    service_status: 'Required',
-    ai_assessment: 'Trunk cavity exceeds 35% cross-sectional area with visible fungal conks.',
-    assigned_at: new Date(Date.now() - 86400000 * 1).toISOString(),
-    due_date: new Date(Date.now() + 86400000 * 1).toISOString(),
-    created_at: new Date(Date.now() - 86400000 * 1).toISOString(),
-    image_url: 'https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=300&fit=crop',
-  },
-  {
-    id: 'ASN-2026-0103',
-    inspector_id: 'usr-insp-001',
-    report_id: 'TRG-2026-1104',
-    tree_id: 'TRE-9104',
-    title: 'Storm Damage Assessment: Broken Scaffold Branch on Teak',
-    location_name: 'Gandhipuram Cross Cut Road',
-    priority: 'High',
-    status: 'in-progress',
-    inspection_status: 'Inspection Completed',
-    service_required: true,
-    service_status: 'Service In Progress',
-    work_performed: 'Crown reduction and hazardous branch pruning scheduled',
-    assigned_at: new Date(Date.now() - 86400000 * 2).toISOString(),
-    due_date: new Date(Date.now() + 86400000 * 2).toISOString(),
-    created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
-    image_url: 'https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?w=300&fit=crop',
-  },
-  {
-    id: 'ASN-2026-0104',
-    inspector_id: 'usr-insp-001',
-    report_id: 'TRG-2026-1215',
-    tree_id: 'TRE-6320',
-    title: 'Routine Health and Crown Clearance Audit: Rain Tree',
-    location_name: 'Peelamedu Park Perimeter',
-    priority: 'Medium',
-    status: 'assigned',
-    inspection_status: 'Assigned',
-    service_required: false,
-    service_status: 'Not Required',
-    assigned_at: new Date(Date.now() - 86400000 * 3).toISOString(),
-    due_date: new Date(Date.now() + 86400000 * 3).toISOString(),
-    created_at: new Date(Date.now() - 86400000 * 3).toISOString(),
-    image_url: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=300&fit=crop',
-  },
-  {
-    id: 'ASN-2026-0105',
-    inspector_id: 'usr-insp-001',
-    report_id: 'TRG-2026-0730',
-    tree_id: 'TRE-5511',
-    title: 'Completed: Gulmohar Branch Clearance and Cabling',
-    location_name: 'Saibaba Colony, 7th Cross',
-    priority: 'Low',
-    status: 'completed',
-    inspection_status: 'Inspection Completed',
-    service_required: true,
-    service_status: 'Service Completed',
-    work_performed: 'Cabling & Structural Bracing',
-    completion_notes: 'Support cables installed at 2/3 height. Structural stability restored.',
-    assigned_at: new Date(Date.now() - 86400000 * 5).toISOString(),
-    completed_at: new Date(Date.now() - 86400000 * 1).toISOString(),
-    created_at: new Date(Date.now() - 86400000 * 5).toISOString(),
-    image_url: 'https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=300&fit=crop',
-  },
-];
-
   const loadDashboard = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -214,15 +121,11 @@ const DEMO_INSPECTOR_ASSIGNMENTS: InspectorAssignment[] = [
         inspectorApi.getAssignments(),
         inspectorApi.getStats().catch(() => null),
       ]);
-      if (assignmentsData && assignmentsData.length > 0) {
-        setAssignments(assignmentsData);
-      } else {
-        setAssignments(DEMO_INSPECTOR_ASSIGNMENTS);
-      }
+      setAssignments(assignmentsData || []);
       setStats(statsData);
-    } catch {
-      // Presentation/Demo mode fallback: seamlessly load demonstration data
-      setAssignments(DEMO_INSPECTOR_ASSIGNMENTS);
+    } catch (err: any) {
+      setError(err?.message || 'Failed to load inspector assignments.');
+      setAssignments([]);
     } finally {
       setLoading(false);
     }
@@ -514,69 +417,7 @@ const DEMO_INSPECTOR_ASSIGNMENTS: InspectorAssignment[] = [
         </div>
       </div>
 
-      {/* 3. Urgent Emergency Field Cases Callout (Main Section 3) */}
-      {activeEmergencies.length > 0 && (
-        <div className="bg-gradient-to-r from-red-600 via-rose-600 to-red-700 rounded-2xl p-5 text-white shadow-lg space-y-3">
-          <div className="flex items-center justify-between flex-wrap gap-2 border-b border-white/20 pb-3">
-            <div className="flex items-center gap-2.5">
-              <span className="w-3 h-3 bg-white rounded-full animate-ping" />
-              <span className="text-xs font-extrabold uppercase tracking-wider text-white">
-                Emergency Field Cases Assigned to You
-              </span>
-            </div>
-            <span className="text-xs text-red-100 bg-red-900/60 px-2.5 py-0.5 rounded-full font-mono font-bold">
-              {activeEmergencies.length} Active Hazard{activeEmergencies.length > 1 ? 's' : ''}
-            </span>
-          </div>
-
-          <div className="space-y-2 pt-1">
-            {activeEmergencies.map((emg) => (
-              <div
-                key={emg.id}
-                className="bg-white/10 backdrop-blur-xs rounded-xl p-4 border border-white/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-              >
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-mono text-xs font-bold text-white bg-red-900/80 px-2 py-0.5 rounded">
-                      {emg.id}
-                    </span>
-                    {emg.tree_id && (
-                      <span className="font-mono text-xs text-red-100">
-                        Tree: {emg.tree_id}
-                      </span>
-                    )}
-                    <span className="text-[10px] bg-red-800 text-white px-2 py-0.5 rounded-full font-bold uppercase">
-                      Immediate Response
-                    </span>
-                  </div>
-                  <h4 className="font-bold text-sm text-white">{emg.title}</h4>
-                  <p className="text-xs text-red-100 mt-0.5">{emg.location_name}</p>
-                  {emg.ai_assessment && (
-                    <p className="text-[11px] text-red-200 mt-1 italic leading-tight">
-                      "{emg.ai_assessment}"
-                    </p>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setInspectModalAssignment(emg);
-                      setInspectSeverity('Emergency');
-                    }}
-                    className="bg-white text-red-700 hover:bg-red-50 text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm cursor-pointer"
-                  >
-                    Resolve Emergency →
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* 4. Priority Field Work (Main Section 1) */}
+      {/* 3. Priority Field Work (Main Section 1) */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-50 flex-wrap gap-3">
           <div>
@@ -763,53 +604,7 @@ const DEMO_INSPECTOR_ASSIGNMENTS: InspectorAssignment[] = [
         )}
       </div>
 
-      {/* 5. Today's Assignments (Main Section 2) */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="font-bold text-gray-900 text-sm">Today's Assignments</h2>
-            <p className="text-xs text-gray-400">Scheduled work orders assigned specifically to your arborist badge</p>
-          </div>
-          <span className="text-xs font-mono font-bold text-forest-800 bg-forest-50 px-2.5 py-1 rounded-lg border border-forest-100">
-            {assignments.length} Total Assigned
-          </span>
-        </div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-          {assignments.slice(0, 6).map((item) => (
-            <div
-              key={item.id}
-              className="p-4 bg-gray-50/70 hover:bg-gray-50 rounded-xl border border-gray-100 space-y-2.5 transition"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-bold text-forest-800 bg-white px-2 py-0.5 rounded border border-gray-200">
-                  {item.tree_id || item.id}
-                </span>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${priorityColors[item.priority] || 'text-gray-600 bg-white'}`}>
-                  {item.priority}
-                </span>
-              </div>
-              <div>
-                <p className="text-xs font-bold text-gray-900 truncate">{item.title}</p>
-                <p className="text-[11px] text-gray-500 truncate mt-0.5">{item.location_name}</p>
-              </div>
-              <div className="flex items-center justify-between pt-1 border-t border-gray-200/60 text-[11px]">
-                <span className="text-gray-500 font-medium">
-                  {item.inspection_status || 'Assigned'}
-                </span>
-                <Link
-                  to={`/app/inspector/${encodeURIComponent(item.id)}`}
-                  className="text-forest-700 font-bold hover:underline"
-                >
-                  View Order →
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 6. Work Completion & Operational Lifecycle Pipeline (Main Section 4) */}
+      {/* 4. Work Completion & Operational Lifecycle Pipeline (Main Section 4) */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-5">
         <div className="flex items-center justify-between border-b border-gray-100 pb-3">
           <div>

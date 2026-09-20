@@ -20,7 +20,10 @@ from app.api.observations import router as observations_router
 from app.api.notifications import router as notifications_router
 from app.api.admin import router as admin_router
 from app.api.analytics import router as analytics_router
+from app.models.user import User
 from app.services.tree_service import tree_service
+from app.services.auth_service import auth_service
+from app.services.inspector_service import inspector_service
 
 # Configure logging
 logging.basicConfig(
@@ -53,6 +56,7 @@ async def lifespan(app: FastAPI):
                     ("avatar_url", "VARCHAR(500)"),
                     ("notification_preferences", "TEXT"),
                     ("privacy_settings", "TEXT"),
+                    ("is_client_presentation", "BOOLEAN DEFAULT 0"),
                 ]
                 for col_name, col_def in new_user_cols:
                     if col_name not in user_cols:
@@ -107,7 +111,57 @@ async def lifespan(app: FastAPI):
     # Seed initial trees if empty
     async with async_session_maker() as session:
         await tree_service.seed_initial_trees_if_empty(session)
-    logger.info("Urban forestry trees verified and loaded.")
+        
+        # Seed or verify dedicated client presentation account
+        client_user = await auth_service.get_user_by_email(session, "client@treeguard.org")
+        if not client_user:
+            client_user = User(
+                full_name="TreeGuard Client",
+                email="client@treeguard.org",
+                password_hash=auth_service.hash_password("SecurePassword123!"),
+                role="admin",
+                is_client_presentation=True,
+                primary_district="RS Puram, Coimbatore",
+                is_active=True
+            )
+            session.add(client_user)
+            await session.commit()
+            await session.refresh(client_user)
+            logger.info("Created dedicated client presentation account: client@treeguard.org")
+        else:
+            if not getattr(client_user, "is_client_presentation", False):
+                client_user.is_client_presentation = True
+                session.add(client_user)
+                await session.commit()
+
+        # Seed inspector assignments for client account so field operations work immediately
+        await inspector_service.seed_initial_inspector_assignments_if_empty(session, client_user.id)
+
+        # Ensure standard role test accounts exist
+        for email, name, role in [
+            ("citizen@treeguard.org", "Citizen Ramesh", "citizen"),
+            ("inspector@treeguard.org", "Field Inspector Kumar", "inspector"),
+            ("admin@treeguard.org", "Admin Officer", "admin"),
+        ]:
+            u = await auth_service.get_user_by_email(session, email)
+            if not u:
+                u = User(
+                    full_name=name,
+                    email=email,
+                    password_hash=auth_service.hash_password("SecurePassword123!"),
+                    role=role,
+                    is_client_presentation=False,
+                    primary_district="RS Puram, Coimbatore",
+                    is_active=True
+                )
+                session.add(u)
+                await session.commit()
+                await session.refresh(u)
+                logger.info(f"Seeded standard {role} user: {email}")
+            if role == "inspector":
+                await inspector_service.seed_initial_inspector_assignments_if_empty(session, u.id)
+
+    logger.info("Urban forestry trees and presentation accounts verified and loaded.")
 
     yield
     logger.info("Shutting down TreeGuard Backend...")

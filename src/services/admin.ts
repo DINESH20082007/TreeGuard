@@ -174,6 +174,39 @@ export interface MonitoringDashboardResponse {
   attention_trees: AttentionTreeItem[];
 }
 
+export interface UserManagementItem {
+  id: string;
+  full_name: string;
+  email: string;
+  role: 'citizen' | 'inspector' | 'admin';
+  is_active: boolean;
+  primary_district?: string;
+  phone_number?: string | null;
+  created_at: string;
+  assigned_count: number;
+  reports_count: number;
+}
+
+export interface OrganizationSettingsResponse {
+  organization_name: string;
+  jurisdiction: string;
+  emergency_sla_hours: number;
+  auto_assignment_enabled: boolean;
+  triage_model: string;
+  dispatch_email: string;
+  primary_contact: string;
+  last_updated?: string;
+}
+
+export interface OrganizationSettingsUpdate {
+  organization_name?: string;
+  jurisdiction?: string;
+  emergency_sla_hours?: number;
+  auto_assignment_enabled?: boolean;
+  dispatch_email?: string;
+  primary_contact?: string;
+}
+
 export const adminApi = {
   getDashboard: () =>
     apiRequest<AdminDashboardResponse>('/api/admin/dashboard', {
@@ -182,6 +215,24 @@ export const adminApi = {
   getMonitoring: () =>
     apiRequest<MonitoringDashboardResponse>('/api/admin/monitoring', {
       method: 'GET',
+    }),
+  getUsers: () =>
+    apiRequest<UserManagementItem[]>('/api/admin/users', {
+      method: 'GET',
+    }),
+  updateUserStatus: (userId: string, payload: { is_active?: boolean; role?: string }) =>
+    apiRequest<UserManagementItem>(`/api/admin/users/${userId}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
+  getSettings: () =>
+    apiRequest<OrganizationSettingsResponse>('/api/admin/settings', {
+      method: 'GET',
+    }),
+  updateSettings: (payload: OrganizationSettingsUpdate) =>
+    apiRequest<OrganizationSettingsResponse>('/api/admin/settings', {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
     }),
 };
 

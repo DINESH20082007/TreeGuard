@@ -105,7 +105,8 @@ async def get_reports_index(
     """
     If admin or inspector, returns all organization reports; otherwise returns user's reports.
     """
-    if current_user.role in ["admin", "inspector"]:
+    is_client = bool(getattr(current_user, "is_client_presentation", False) or current_user.email == "client@treeguard.org")
+    if current_user.role in ["admin", "inspector"] or is_client:
         return await report_service.get_all_reports(db)
     return await report_service.get_user_reports(db, current_user.id)
 
@@ -147,7 +148,8 @@ async def get_report(
         )
     
     # Check access permission: user must be the reporter or have elevated role
-    if report_resp.reporter_id != current_user.id and current_user.role not in ["inspector", "admin"]:
+    is_client = bool(getattr(current_user, "is_client_presentation", False) or current_user.email == "client@treeguard.org")
+    if report_resp.reporter_id != current_user.id and current_user.role not in ["inspector", "admin"] and not is_client:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You do not have permission to access this report."

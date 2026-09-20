@@ -236,52 +236,7 @@ export default function CitizenDashboard() {
         </div>
       </div>
 
-      {/* 3. Nearby Emergencies & Hazards Callout */}
-      {emergencyNearbyTrees.length > 0 && (
-        <div className="bg-gradient-to-r from-red-600 via-rose-600 to-red-700 rounded-2xl p-5 text-white shadow-lg space-y-3">
-          <div className="flex items-center justify-between flex-wrap gap-2 border-b border-white/20 pb-3">
-            <div className="flex items-center gap-2.5">
-              <span className="w-3 h-3 bg-white rounded-full animate-ping" />
-              <span className="text-xs font-extrabold uppercase tracking-wider text-white">
-                Urgent Tree Hazards in Your Area
-              </span>
-            </div>
-            <span className="text-xs text-red-100 bg-red-800/60 px-2.5 py-0.5 rounded-full font-mono font-medium">
-              {emergencyNearbyTrees.length} Active Hazard{emergencyNearbyTrees.length > 1 ? 's' : ''}
-            </span>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-3 pt-1">
-            {emergencyNearbyTrees.slice(0, 2).map((tree) => (
-              <div key={tree.id} className="bg-white/10 backdrop-blur-xs rounded-xl p-3.5 border border-white/15 flex items-center gap-3">
-                <img
-                  src={getTreeImage(tree)}
-                  alt={tree.species}
-                  className="w-12 h-12 rounded-lg object-cover bg-white/20 flex-shrink-0"
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs font-bold text-red-100">{tree.id}</span>
-                    <span className="text-[10px] bg-red-900/60 text-white px-1.5 py-0.5 rounded font-bold uppercase">
-                      Hazard
-                    </span>
-                  </div>
-                  <p className="text-xs font-bold truncate text-white mt-0.5">{tree.common_name || tree.species}</p>
-                  <p className="text-[11px] text-red-100 truncate">{tree.location_name}</p>
-                </div>
-                <Link
-                  to={`/app/tree/${tree.id}`}
-                  className="text-xs bg-white text-red-700 hover:bg-red-50 px-3 py-1.5 rounded-lg font-bold transition shadow-sm flex-shrink-0"
-                >
-                  View Tree →
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* 4. Main Two-Column Layout: Nearby Tree Risks & Quick Actions */}
+      {/* 3. Main Two-Column Layout: Nearby Tree Risks & Quick Actions */}
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Nearby Tree Risks (Left 2 cols) */}
         <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">

@@ -20,11 +20,17 @@ import CreateRecoveryPlan from './pages/citizen/CreateRecoveryPlan';
 import RecoveryPlanDetail from './pages/citizen/RecoveryPlanDetail';
 import AIComparison from './pages/citizen/AIComparison';
 import InspectorDashboard from './pages/inspector/InspectorDashboard';
+import AssignmentsList from './pages/inspector/AssignmentsList';
+import FieldInspections from './pages/inspector/FieldInspections';
+import EmergencyCases from './pages/inspector/EmergencyCases';
 import InspectionDetail from './pages/inspector/InspectionDetail';
 import FollowUpObservation from './pages/inspector/FollowUpObservation';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import EmergencyOperations from './pages/admin/EmergencyOperations';
 import Analytics from './pages/admin/Analytics';
 import MonitoringDashboard from './pages/admin/MonitoringDashboard';
+import UserManagement from './pages/admin/UserManagement';
+import OrganizationSettings from './pages/admin/OrganizationSettings';
 import RoleDashboardDispatcher from './pages/RoleDashboardDispatcher';
 
 export const router = createBrowserRouter([
@@ -80,6 +86,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={['citizen', 'inspector', 'admin']}>
             <RoleDashboardDispatcher />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'citizen',
+        element: (
+          <ProtectedRoute allowedRoles={['citizen', 'inspector', 'admin']}>
+            <CitizenDashboard />
           </ProtectedRoute>
         ),
       },
@@ -171,11 +185,36 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      // Field Inspector Workspace Routes
       {
         path: 'inspector',
         element: (
           <ProtectedRoute allowedRoles={['inspector', 'admin']}>
             <InspectorDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'inspector/assignments',
+        element: (
+          <ProtectedRoute allowedRoles={['inspector', 'admin']}>
+            <AssignmentsList />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'inspector/inspections',
+        element: (
+          <ProtectedRoute allowedRoles={['inspector', 'admin']}>
+            <FieldInspections />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'inspector/emergency',
+        element: (
+          <ProtectedRoute allowedRoles={['inspector', 'admin']}>
+            <EmergencyCases />
           </ProtectedRoute>
         ),
       },
@@ -195,11 +234,20 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      // Organization Admin Workspace Routes
       {
         path: 'admin',
         element: (
           <ProtectedRoute allowedRoles={['admin']}>
             <AdminDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'admin/emergency',
+        element: (
+          <ProtectedRoute allowedRoles={['admin']}>
+            <EmergencyOperations />
           </ProtectedRoute>
         ),
       },
@@ -216,6 +264,22 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={['admin', 'inspector']}>
             <MonitoringDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'admin/users',
+        element: (
+          <ProtectedRoute allowedRoles={['admin']}>
+            <UserManagement />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'admin/settings',
+        element: (
+          <ProtectedRoute allowedRoles={['admin']}>
+            <OrganizationSettings />
           </ProtectedRoute>
         ),
       },

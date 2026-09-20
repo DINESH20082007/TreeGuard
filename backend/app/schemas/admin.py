@@ -185,3 +185,37 @@ class MonitoringDashboardResponse(BaseModel):
     upcoming_reinspections: List[UpcomingReinspectionItem]
     attention_trees: List[AttentionTreeItem]
 
+class UserManagementItem(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    full_name: str
+    email: str
+    role: str
+    is_active: bool
+    primary_district: Optional[str] = "RS Puram, Coimbatore"
+    phone_number: Optional[str] = None
+    created_at: datetime
+    assigned_count: int = 0
+    reports_count: int = 0
+
+class OrganizationSettingsResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    organization_name: str
+    jurisdiction: str
+    emergency_sla_hours: float
+    auto_assignment_enabled: bool
+    triage_model: str
+    dispatch_email: str
+    primary_contact: str
+    last_updated: Optional[str] = None
+
+class OrganizationSettingsUpdate(BaseModel):
+    organization_name: Optional[str] = None
+    jurisdiction: Optional[str] = None
+    emergency_sla_hours: Optional[float] = None
+    auto_assignment_enabled: Optional[bool] = None
+    dispatch_email: Optional[str] = None
+    primary_contact: Optional[str] = None
+

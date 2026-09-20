@@ -87,34 +87,6 @@ export default function Landing() {
               </Link>
             </div>
           </div>
-
-          {/* Dashboard preview card */}
-          <div className="mt-16 bg-white/10 backdrop-blur rounded-2xl border border-white/20 p-6 max-w-sm hidden lg:block absolute right-0 top-20">
-            <div className="text-white text-sm font-medium mb-4 flex items-center gap-2">
-              <span className="w-2 h-2 bg-red-400 rounded-full animate-pulse" />
-              Live Emergency Alert
-            </div>
-            <div className="bg-red-500/20 border border-red-400/30 rounded-xl p-4 mb-3">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-red-500/30 flex items-center justify-center text-lg flex-shrink-0">🌳</div>
-                <div>
-                  <p className="text-white font-medium text-sm">Fallen tree — road obstruction</p>
-                  <p className="text-forest-200 text-xs mt-0.5">DB Road & 3rd Cross, RS Puram, Coimbatore · Severity: High</p>
-                  <span className="inline-block mt-2 text-xs bg-red-500/40 text-red-200 px-2 py-0.5 rounded-full">Emergency</span>
-                </div>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="bg-white/10 rounded-lg p-3">
-                <p className="text-white text-lg font-semibold">94%</p>
-                <p className="text-forest-300 text-xs">AI confidence</p>
-              </div>
-              <div className="bg-white/10 rounded-lg p-3">
-                <p className="text-white text-lg font-semibold">12 min</p>
-                <p className="text-forest-300 text-xs">Response time</p>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -211,7 +183,7 @@ export default function Landing() {
               Create free account
             </Link>
             <Link to="/app" className="border border-forest-400 text-white px-6 py-3 rounded-lg font-semibold hover:bg-forest-700 transition-colors text-sm">
-              View demo dashboard
+              Explore platform
             </Link>
           </div>
         </div>
@@ -244,7 +216,7 @@ export default function Landing() {
             ))}
           </div>
           <div className="border-t border-forest-800 pt-8 text-center">
-            <p className="text-forest-500 text-sm">© 2026 TreeGuard. Sample data for demonstration purposes.</p>
+            <p className="text-forest-500 text-sm">© 2026 TreeGuard. All rights reserved.</p>
           </div>
         </div>
       </footer>

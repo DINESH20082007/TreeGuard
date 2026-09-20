@@ -23,6 +23,8 @@ export interface User {
   full_name: string;
   email: string;
   role: UserRole;
+  is_client_presentation?: boolean;
+  can_access_all_dashboards?: boolean;
   phone_number?: string | null;
   primary_district?: string | null;
   avatar_url?: string | null;

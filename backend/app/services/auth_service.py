@@ -45,11 +45,14 @@ class AuthService:
             expires_delta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
 
         expire = datetime.now(timezone.utc) + expires_delta
+        is_client = bool(getattr(user, "is_client_presentation", False) or user.email == "client@treeguard.org")
         payload = {
             "sub": user.id,
             "email": user.email,
             "role": user.role,
             "full_name": user.full_name,
+            "is_client_presentation": is_client,
+            "can_access_all_dashboards": is_client,
             "exp": expire,
             "iat": datetime.now(timezone.utc),
             "type": "access",
@@ -229,6 +232,7 @@ class AuthService:
                 privacy_prefs = None
 
         member_since = user.created_at.strftime("%B %Y") if user.created_at else "March 2024"
+        is_client = bool(getattr(user, "is_client_presentation", False) or user.email == "client@treeguard.org")
 
         return UserProfileResponse(
             id=user.id,
@@ -241,6 +245,8 @@ class AuthService:
             notification_preferences=notif_prefs,
             privacy_settings=privacy_prefs,
             member_since=member_since,
+            is_client_presentation=is_client,
+            can_access_all_dashboards=is_client,
             is_active=user.is_active,
             created_at=user.created_at,
         )
