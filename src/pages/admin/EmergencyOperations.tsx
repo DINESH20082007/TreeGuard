@@ -21,7 +21,7 @@ export default function EmergencyOperations() {
       setError(null);
       try {
         const [allReports, allTrees, dashData] = await Promise.all([
-          reportsApi.getReports().catch(() => []),
+          reportsApi.getAllReports().catch(() => []),
           treesApi.getTrees().catch(() => []),
           adminApi.getDashboard().catch(() => null),
         ]);
@@ -29,7 +29,7 @@ export default function EmergencyOperations() {
           setReports(allReports || []);
           setTrees(allTrees || []);
           setAdminData(dashData);
-          const emerg = (allReports || []).find((r) => r.priority === 'Emergency' || r.priority === 'High');
+          const emerg = (allReports || []).find((r: Report) => r.priority === 'Emergency' || r.priority === 'High');
           if (emerg) setSelectedReport(emerg);
         }
       } catch (err: any) {
@@ -166,7 +166,7 @@ export default function EmergencyOperations() {
                     </span>
                     <StatusBadge status={r.status} />
                   </div>
-                  <p className="font-semibold text-sm text-gray-900 line-clamp-1">{r.title || r.location_name}</p>
+                  <p className="font-semibold text-sm text-gray-900 line-clamp-1">{r.description || r.location_name}</p>
                   <p className="text-xs text-gray-500 mt-1 line-clamp-1">📍 {r.location_name}</p>
                   <div className="flex items-center justify-between text-[11px] text-gray-400 mt-2.5 pt-2 border-t border-gray-100/80">
                     <span>ID: {r.id}</span>
@@ -195,7 +195,7 @@ export default function EmergencyOperations() {
                     </span>
                   </div>
                   <h2 className="text-xl font-bold text-gray-900 font-display">
-                    {selectedReport.title || 'Hazardous Tree Condition'}
+                    {selectedReport.description || selectedReport.location_name || 'Hazardous Tree Condition'}
                   </h2>
                   <p className="text-sm text-gray-500 mt-0.5">📍 {selectedReport.location_name}</p>
                 </div>

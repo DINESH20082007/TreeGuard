@@ -15,7 +15,7 @@ router = APIRouter(prefix="/analytics", tags=["Analytics"])
     summary="Get municipal canopy health & risk analytics"
 )
 async def get_analytics(
-    range: str = Query(default="90d", regex="^(7d|30d|90d|1y)$", description="Date range for analytics calculations"),
+    range: str = Query(default="90d", pattern="^(7d|30d|90d|1y)$", description="Date range for analytics calculations"),
     current_user: User = Depends(require_role(["admin"])),
     db: AsyncSession = Depends(get_db)
 ):
